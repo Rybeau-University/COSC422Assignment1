@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/COSC422Assignment1.out.dir/TerrainPatches.cpp.o -o COSC422Assignment1.out  -Wl,-rpath,/usr/local/lib /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/local/lib/libglut.so /usr/lib/x86_64-linux-gnu/libXmu.so /usr/lib/x86_64-linux-gnu/libXi.so /usr/lib64/libGLEW.so 
