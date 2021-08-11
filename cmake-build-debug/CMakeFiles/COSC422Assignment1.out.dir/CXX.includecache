@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ryan/Desktop/COSC422Assignment1/TerrainPatches.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+GL/glew.h
+-
+GL/freeglut.h
+-
+glm/glm.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+loadTGA.h
+/home/ryan/Desktop/COSC422Assignment1/loadTGA.h
+glm/gtc/type_ptr.hpp
+-
+
+/home/ryan/Desktop/COSC422Assignment1/loadTGA.h
+iostream
+-
+fstream
+-
+
