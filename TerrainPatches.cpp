@@ -38,8 +38,9 @@ float speed = 2.0;
 float camX = 0.0;
 float camZ = 30.0;
 float camY = 20.0;
+float angle = -90.0 * CDR;
 glm::vec3 cameraPos   = glm::vec3(camX, camY, camZ);
-glm::vec3 cameraFront = glm::vec3(0.0, 10.0, -40.0);
+glm::vec3 cameraFront = glm::vec3(camX+cos(angle), 20.0, camZ+sin(angle));
 glm::vec3 cameraUp = glm::vec3(0.0, 1.0, 0.0);
 
 //Generate vertex and element data for the terrain floor
@@ -245,17 +246,12 @@ void calculateMove(float direction) {
     cameraPos = glm::vec3 (camX,camY,camZ);
     cameraFront += glm::vec3 (moveX * direction * speed,0.0,moveZ * direction * speed);
     view = glm::lookAt(cameraPos, cameraFront, cameraUp);
-//    view = glm::translate(view, glm::vec3(moveX * direction, 0.0, moveZ * direction));
 }
 
 void rotateCamera(float direction){
-    float angle = 5*CDR;
-    float yArray[16] = {cos(angle * direction),0,-sin(angle*direction), 0,0,1,0,0, sin(angle*direction), 0,cos(angle*direction),0,0,0,0,1};
-    glm::mat4 yRotation= glm::make_mat4(yArray);
-//    float yArray3x3[9] = {cos(angle * direction),0,sin(angle*direction),0,1,0, -sin(angle*direction), 0,cos(angle*direction)};
-//    glm::mat3 yRotation3x3= glm::make_mat3(yArray3x3);
-    view = view * yRotation;
-//    cameraFront = yRotation3x3 * cameraFront;
+    angle += direction * 5 * CDR;
+    cameraFront = glm::vec3(camX+cos(angle), 20.0, camZ+sin(angle));
+    view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 }
 
 void onSpecialKey(int key, int x, int y){
