@@ -29,10 +29,11 @@ GLushort elems[81*4];       //Element array for 81 quad patches
 glm::mat4 projView;
 glm::mat4 proj, view;   //Projection and view matrices
 GLuint eyePosLoc;
-
+GLuint mvMatrixLoc, norMatrixLoc;
+bool wireframe = false;
 //Texture Globals
 GLuint heightMap;
-GLuint texID[2];
+GLuint texID[5];
 
 //Camera Globals
 float speed = 2.0;
@@ -75,11 +76,7 @@ void generateData()
 	}
 }
 
-//Loads terrain texture
-void loadTextures()
-{
-
-    glGenTextures(2, texID);
+void loadHeightMaps(){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texID[0]);
     loadTGA("./HeightMaps/MtRuapehu.tga");
@@ -94,6 +91,40 @@ void loadTextures()
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+void loadTextures(){
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texID[2]);
+    loadTGA("./Textures/grass2.tga");
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, texID[3]);
+    loadTGA("./Textures/water.tga");
+
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, texID[4]);
+    loadTGA("./Textures/snow.tga");
+
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+//Loads TGA files
+void loadTGAs()
+{
+    glGenTextures(5, texID);
+    loadHeightMaps();
+    loadTextures();
+
 }
 
 
@@ -129,16 +160,15 @@ GLuint loadShader(GLenum shaderType, string filename)
 //Initialise the shader program, create and load buffer data
 void initialise()
 {
-//	glm::mat4 proj, view;   //Projection and view matrices
 
-	//--------Load terrain height map-----------
-	loadTextures();
-
+//--------Textures-----------
+	loadTGAs();
 	//--------Load shaders----------------------
 	GLuint shaderv = loadShader(GL_VERTEX_SHADER, "TerrainPatches.vert");
 	GLuint shaderf = loadShader(GL_FRAGMENT_SHADER, "TerrainPatches.frag");
 	GLuint shaderc = loadShader(GL_TESS_CONTROL_SHADER, "TerrainPatches.cont");
 	GLuint shadere = loadShader(GL_TESS_EVALUATION_SHADER, "TerrainPatches.eval");
+	GLuint shaderg = loadShader(GL_GEOMETRY_SHADER, "TerrainPatches.geom");
 
 	//--------Attach shaders---------------------
 	GLuint program = glCreateProgram();
@@ -146,6 +176,7 @@ void initialise()
 	glAttachShader(program, shaderf);
 	glAttachShader(program, shaderc);
 	glAttachShader(program, shadere);
+	glAttachShader(program, shaderg);
 
 	glLinkProgram(program);
 
@@ -164,13 +195,24 @@ void initialise()
 	eyePosLoc = glGetUniformLocation(program, "eyePos");
 	mvpMatrixLoc = glGetUniformLocation(program, "mvpMatrix");
 	heightMap = glGetUniformLocation(program, "heightMap");
+	GLuint lgtLoc = glGetUniformLocation(program, "lightPos");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
+glm::vec4 light = glm::vec4(0.0, 40.0, -50.0, 1.0);
 	proj = glm::perspective(30.0f*CDR, 1.25f, 20.0f, 500.0f);  //perspective projection matrix
 	view = glm::lookAt(cameraPos, cameraFront, cameraUp); //view matrix
+	glm::vec4 lightEye = view*light;
 	projView = proj * view;  //Product matrix
 	glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
+	glUniform3fv(lgtLoc, 1, &lightEye[0]);
+// Setup texture samplers
+    GLuint grassLoc = glGetUniformLocation(program, "grassSampler");
+    glUniform1i(grassLoc, 2);
+    GLuint waterLoc = glGetUniformLocation(program, "waterSampler");
+    glUniform1i(waterLoc, 3);
+    GLuint snowLoc = glGetUniformLocation(program, "snowSampler");
+    glUniform1i(snowLoc, 4);
 
 //---------Load buffer data-----------------------
 	generateData();
@@ -195,15 +237,17 @@ void initialise()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 //Display function to compute uniform values based on transformation parameters and to draw the scene
 void display()
 {
-    projView = proj * view;  //Product matrix
-	glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &projView[0][0]);
+
+    glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
+
+    glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &mvpMatrix[0][0]);
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vaoID);
@@ -215,6 +259,16 @@ void changeHeightMap(int texture){
     glUniform1i(heightMap, texture);
 }
 
+void toggleWireframe(){
+    if(wireframe){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    wireframe = !wireframe;
+
+}
+
 void onKeyPress(unsigned char key, int x, int y){
     switch (key) {
         case '1':
@@ -223,16 +277,14 @@ void onKeyPress(unsigned char key, int x, int y){
         case '2':
             changeHeightMap(1);
             break;
+        case ' ':
+            fprintf(stderr, "Space");
+            toggleWireframe();
+            break;
         default:
             break;
     }
     glutPostRedisplay();
-}
-
-void checkCamera(void){
-
-
-
 }
 
 void calculateMove(float direction) {

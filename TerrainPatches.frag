@@ -1,7 +1,15 @@
 #version 330
 
+uniform sampler2D grassSampler;
+uniform sampler2D waterSampler;
+uniform sampler2D snowSampler;
 
-void main() 
+uniform mat4 mvpMatrix;
+
+in vec2 TexCoord;
+
+
+void main()
 {
-     gl_FragColor = vec4(0, 0, 1, 1);
+    gl_FragColor = texture(grassSampler, TexCoord);
 }
