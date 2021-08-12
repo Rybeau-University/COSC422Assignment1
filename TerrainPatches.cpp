@@ -28,6 +28,7 @@ float verts[100*3];       //10x10 grid (100 vertices)
 GLushort elems[81*4];       //Element array for 81 quad patches
 glm::mat4 projView;
 glm::mat4 proj, view;   //Projection and view matrices
+GLuint eyePosLoc;
 
 //Texture Globals
 GLuint heightMap;
@@ -160,17 +161,16 @@ void initialise()
 		delete[] strInfoLog;
 	}
 	glUseProgram(program);
-
+	eyePosLoc = glGetUniformLocation(program, "eyePos");
 	mvpMatrixLoc = glGetUniformLocation(program, "mvpMatrix");
 	heightMap = glGetUniformLocation(program, "heightMap");
-	GLuint eyePosLoc = glGetUniformLocation(program, "eyePos");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
 	proj = glm::perspective(30.0f*CDR, 1.25f, 20.0f, 500.0f);  //perspective projection matrix
 	view = glm::lookAt(cameraPos, cameraFront, cameraUp); //view matrix
 	projView = proj * view;  //Product matrix
-	glUniform1f(eyePosLoc, 30.0 );
+	glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
 
 //---------Load buffer data-----------------------
 	generateData();
@@ -229,6 +229,12 @@ void onKeyPress(unsigned char key, int x, int y){
     glutPostRedisplay();
 }
 
+void checkCamera(void){
+
+
+
+}
+
 void calculateMove(float direction) {
     float lookX = cameraFront[0];
     float lookZ = cameraFront[2];
@@ -241,11 +247,32 @@ void calculateMove(float direction) {
         moveX /= abs(moveZ);
         moveZ /= abs(moveZ);
     }
-    camX += moveX * direction * speed;
-    camZ += moveZ * direction * speed;
+    float newX = camX + moveX * direction * speed;
+    float newZ = camZ + moveZ * direction * speed;
+    if (newX > 150.0){
+        newX = 150.0;
+        moveX = 0.0;
+    }
+    if (newX < -150.0){
+        newX = -150.0;
+        moveX = 0.0;
+    }
+    if (newZ < -150.0){
+        newZ = -150.0;
+        moveZ = 0.0;
+    }
+    if (newZ > 120.0){
+        newZ = 120.0;
+        moveZ = 0.0;
+    }
+    camX = newX;
+    camZ = newZ;
+
     cameraPos = glm::vec3 (camX,camY,camZ);
     cameraFront += glm::vec3 (moveX * direction * speed,0.0,moveZ * direction * speed);
     view = glm::lookAt(cameraPos, cameraFront, cameraUp);
+    fprintf(stderr, "X %f, Y%f, Z%f\n", cameraPos[0], cameraPos[1], cameraPos[2]);
+    glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
 }
 
 void rotateCamera(float direction){

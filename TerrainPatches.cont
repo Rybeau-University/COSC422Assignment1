@@ -1,19 +1,20 @@
 #version 400
 
 layout(vertices = 4) out;
-uniform float eyePos;
+uniform vec3 eyePos;
 
 void main()
 {
-    float zmin = 30, zmax = 130;
+    float highLevel = 10.0, lowLevel = 5.0;
+    float distanceMin = 20.0, distanceMax = distance(vec3(150.0, 20.0, 120.0), vec3(-50, 0.0, -100.0));
 
-    float avg_z = ( gl_in[0].gl_Position.z
-    + gl_in[1].gl_Position.z
-    + gl_in[2].gl_Position.z
-    + gl_in[3].gl_Position.z) * 0.25;
-    float dist = distance(eyePos, avg_z);
+    vec3 avg_position = vec3((gl_in[0].gl_Position +
+    + gl_in[1].gl_Position
+    + gl_in[2].gl_Position
+    + gl_in[3].gl_Position)) * 0.25;
+    float dist = distance(eyePos, avg_position);
 
-    int level = 20 - int((dist - zmin) * 18.0 / (zmax - zmin));
+    int level = int(highLevel - ((dist - distanceMin) * (highLevel - lowLevel)) / (distanceMax - distanceMin));
     gl_out[gl_InvocationID].gl_Position
       = gl_in[gl_InvocationID].gl_Position;
     gl_TessLevelOuter[0] = level;
