@@ -20,12 +20,11 @@ out vec4 outputColor;
 vec4 calculateOutputColor(vec4 material, bool specularEnabled){
     vec4 white = vec4(1.0);
     vec4 grey = vec4(0.2);
-    vec4 cyan = vec4(0.0, 1.0, 1.0, 1.0);
 
     vec4 color;
 
     vec4 ambOut = grey * material;
-    float shininess = 150.0;
+    float shininess = 100.0;
     float diffTerm = max(dot(lgtVec, normalEye), 0);
     vec4 diffOut = material * diffTerm;
     float specTerm = max(dot(halfVec, normalEye), 0);

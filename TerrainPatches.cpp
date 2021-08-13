@@ -213,7 +213,7 @@ void initialise()
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
-    glm::vec4 light = glm::vec4(0.0, 0.0, -0.0, 1.0);
+    glm::vec4 light = glm::vec4(10.0, 10.0, -50.0, 1.0);
 	proj = glm::perspective(30.0f*CDR, 1.25f, 20.0f, 500.0f);  //perspective projection matrix
 	view = glm::lookAt(cameraPos, cameraFront, cameraUp); //view matrix
 	glm::vec4 lightEye = view*light;

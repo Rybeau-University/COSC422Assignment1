@@ -34,10 +34,11 @@ void lightingCalculations(){
 void main(){
     float xmin = -45, xmax = +45, zmin = 0, zmax = -100;
 
-    lightingCalculations();
+
 
     for(int i = 0; i < gl_in.length(); i++)
     {
+        lightingCalculations();
         TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
         TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
         height = gl_in[i].gl_Position.y;
