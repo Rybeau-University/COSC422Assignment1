@@ -10,24 +10,26 @@ out vec4 oColor;
 out vec2 TexCoord;
 
 void main(){
-
+    float xmin = -45, xmax = +45, zmin = 0, zmax = -100;
     for(int i = 0; i < gl_in.length(); i++)
     {
+        TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
+        TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
         height = gl_in[i].gl_Position.y;
-        switch (i) {
-            case 0:
-                TexCoord = vec2(0,1);
-                break;
-            case 1:
-                TexCoord = vec2(0,0);
-                break;
-            case 2:
-                TexCoord = vec2(1,1);
-                break;
-            case 3:
-                TexCoord = vec2(1,0);
-                break;
-        }
+//        switch (i) {
+//            case 0:
+//                TexCoord = vec2(0,0);
+//                break;
+//            case 1:
+//                TexCoord = vec2(1,0);
+//                break;
+//            case 2:
+//                TexCoord = vec2(0,1);
+//                break;
+//            case 3:
+//                TexCoord = vec2(1,1);
+//                break;
+//        }
         gl_Position = mvpMatrix * gl_in[i].gl_Position;
         EmitVertex();
     }

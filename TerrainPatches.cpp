@@ -96,7 +96,7 @@ void loadHeightMaps(){
 void loadTextures(){
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texID[2]);
-    loadTGA("./Textures/grass2.tga");
+    loadTGA("./Textures/grass.tga");
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
