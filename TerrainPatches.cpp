@@ -6,7 +6,7 @@
 //
 //	The program generates and loads the mesh data for a terrain floor (100 verts, 81 elems).
 //  Requires files  TerrainPatches.vert, TerrainPatches.frag
-//                  TerrainPatches.cont, TerrainPatches.eval
+//                  TerrainPatches.cont.glsl, TerrainPatches.eval.glsl
 //  ========================================================================
 #define  GLM_FORCE_RADIANS
 #include <iostream>
@@ -34,6 +34,10 @@ bool wireframe = false;
 //Texture Globals
 GLuint heightMap;
 GLuint texID[5];
+GLuint snowHeightLoc;
+GLuint waterHeightLoc;
+float currentWaterHeight = 2.0;
+float currentSnowHeight = 6.0;
 
 //Camera Globals
 float speed = 2.0;
@@ -166,8 +170,8 @@ void initialise()
 	//--------Load shaders----------------------
 	GLuint shaderv = loadShader(GL_VERTEX_SHADER, "TerrainPatches.vert");
 	GLuint shaderf = loadShader(GL_FRAGMENT_SHADER, "TerrainPatches.frag");
-	GLuint shaderc = loadShader(GL_TESS_CONTROL_SHADER, "TerrainPatches.cont");
-	GLuint shadere = loadShader(GL_TESS_EVALUATION_SHADER, "TerrainPatches.eval");
+	GLuint shaderc = loadShader(GL_TESS_CONTROL_SHADER, "TerrainPatches.cont.glsl");
+	GLuint shadere = loadShader(GL_TESS_EVALUATION_SHADER, "TerrainPatches.eval.glsl");
 	GLuint shaderg = loadShader(GL_GEOMETRY_SHADER, "TerrainPatches.geom");
 
 	//--------Attach shaders---------------------
@@ -213,7 +217,10 @@ glm::vec4 light = glm::vec4(0.0, 40.0, -50.0, 1.0);
     glUniform1i(waterLoc, 3);
     GLuint snowLoc = glGetUniformLocation(program, "snowSampler");
     glUniform1i(snowLoc, 4);
-
+    snowHeightLoc = glGetUniformLocation(program, "snowHeight");
+    glUniform1f(snowHeightLoc, currentSnowHeight);
+    waterHeightLoc = glGetUniformLocation(program, "waterHeight");
+    glUniform1f(waterHeightLoc, currentWaterHeight);
 //---------Load buffer data-----------------------
 	generateData();
 
@@ -269,6 +276,26 @@ void toggleWireframe(){
 
 }
 
+void changeSnowHeight(int direction){
+    if(currentSnowHeight > 0.5 + currentWaterHeight && direction == -1){
+        currentSnowHeight += 0.1 * direction;
+        glUniform1f(snowHeightLoc, currentSnowHeight);
+    } else if (direction == 1 && currentSnowHeight < 9.0){
+        currentSnowHeight += 0.1 * direction;
+        glUniform1f(snowHeightLoc, currentSnowHeight);
+    }
+}
+
+void changeWaterHeight(int direction){
+    if(currentSnowHeight - 0.5 > currentWaterHeight && direction == 1){
+        currentWaterHeight += 0.1 * direction;
+        glUniform1f(waterHeightLoc, currentWaterHeight);
+    } else if (direction == -1 && currentWaterHeight > 2.0){
+        currentWaterHeight += 0.1 * direction;
+        glUniform1f(waterHeightLoc, currentWaterHeight);
+    }
+}
+
 void onKeyPress(unsigned char key, int x, int y){
     switch (key) {
         case '1':
@@ -280,6 +307,18 @@ void onKeyPress(unsigned char key, int x, int y){
         case ' ':
             fprintf(stderr, "Space");
             toggleWireframe();
+            break;
+        case 'w':
+            changeSnowHeight(1);
+            break;
+        case 's':
+            changeSnowHeight(-1);
+            break;
+        case 'q':
+            changeWaterHeight(1);
+            break;
+        case 'a':
+            changeWaterHeight(-1);
             break;
         default:
             break;
