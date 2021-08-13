@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(Exercise6)
+project(COSC422Assignment1)
 
 add_executable(COSC422Assignment1.out
         loadTGA.h
