@@ -161,6 +161,14 @@ GLuint loadShader(GLenum shaderType, string filename)
 	return shader;
 }
 
+void calculateMatrices(){
+    glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
+    glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
+    glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &mvpMatrix[0][0]);
+    glUniformMatrix4fv(norMatrixLoc, 1, GL_TRUE, &invMatrix[0][0]);
+    glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, &view[0][0]);
+}
+
 //Initialise the shader program, create and load buffer data
 void initialise()
 {
@@ -198,12 +206,14 @@ void initialise()
 	glUseProgram(program);
 	eyePosLoc = glGetUniformLocation(program, "eyePos");
 	mvpMatrixLoc = glGetUniformLocation(program, "mvpMatrix");
+	mvMatrixLoc = glGetUniformLocation(program, "mvMatrix");
+	norMatrixLoc = glGetUniformLocation(program, "norMatrix");
 	heightMap = glGetUniformLocation(program, "heightMap");
 	GLuint lgtLoc = glGetUniformLocation(program, "lightPos");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
-glm::vec4 light = glm::vec4(0.0, 40.0, -50.0, 1.0);
+    glm::vec4 light = glm::vec4(0.0, 0.0, -0.0, 1.0);
 	proj = glm::perspective(30.0f*CDR, 1.25f, 20.0f, 500.0f);  //perspective projection matrix
 	view = glm::lookAt(cameraPos, cameraFront, cameraUp); //view matrix
 	glm::vec4 lightEye = view*light;
@@ -251,11 +261,7 @@ glm::vec4 light = glm::vec4(0.0, 40.0, -50.0, 1.0);
 //Display function to compute uniform values based on transformation parameters and to draw the scene
 void display()
 {
-
-    glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
-
-    glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &mvpMatrix[0][0]);
-
+    calculateMatrices();
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_PATCHES, 81*4, GL_UNSIGNED_SHORT, NULL);

@@ -5,7 +5,7 @@ uniform vec3 eyePos;
 
 void main()
 {
-    float highLevel = 20.0, lowLevel = 2.0;
+    float highLevel = 100.0, lowLevel = 30.0;
     float distanceMin = 20.0, distanceMax = distance(vec3(150.0, 20.0, 120.0), vec3(-50, 0.0, -100.0));
     vec3 avg_position = vec3((gl_in[0].gl_Position +
     + gl_in[1].gl_Position

@@ -11,21 +11,47 @@ uniform mat4 mvpMatrix;
 
 in vec2 TexCoord;
 in float height;
+in vec4 lgtVec;
+in vec4 normalEye;
+in vec4 halfVec;
 
 out vec4 outputColor;
 
+vec4 calculateOutputColor(vec4 material, bool specularEnabled){
+    vec4 white = vec4(1.0);
+    vec4 grey = vec4(0.2);
+    vec4 cyan = vec4(0.0, 1.0, 1.0, 1.0);
+
+    vec4 color;
+
+    vec4 ambOut = grey * material;
+    float shininess = 150.0;
+    float diffTerm = max(dot(lgtVec, normalEye), 0);
+    vec4 diffOut = material * diffTerm;
+    float specTerm = max(dot(halfVec, normalEye), 0);
+    vec4 specOut = white *  pow(specTerm, shininess);
+
+    color = ambOut + diffOut;
+    if (specularEnabled){
+        color += specOut;
+    }
+    return color;
+}
+
+
 void main()
 {
+
     if (height >= snowHeight){
-        outputColor = texture(snowSampler, TexCoord);
-    } else if (height < snowHeight && height > 0.1 + waterHeight){
+        outputColor = calculateOutputColor(texture(snowSampler, TexCoord), false);
+    } else if (height < snowHeight && height > 0.01 + waterHeight){
         if (height >= snowHeight - 1.0){
-            outputColor = mix(texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height);
+            outputColor = calculateOutputColor(mix(texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height), false);
         } else {
-            outputColor = texture(grassSampler, TexCoord);
+            outputColor = calculateOutputColor(texture(grassSampler, TexCoord), false);
         }
     }else{
-        outputColor = texture(waterSampler, TexCoord);
+        outputColor = calculateOutputColor(texture(waterSampler, TexCoord), true);
     }
 
 }
