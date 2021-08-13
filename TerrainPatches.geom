@@ -16,20 +16,6 @@ void main(){
         TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
         TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
         height = gl_in[i].gl_Position.y;
-//        switch (i) {
-//            case 0:
-//                TexCoord = vec2(0,0);
-//                break;
-//            case 1:
-//                TexCoord = vec2(1,0);
-//                break;
-//            case 2:
-//                TexCoord = vec2(0,1);
-//                break;
-//            case 3:
-//                TexCoord = vec2(1,1);
-//                break;
-//        }
         gl_Position = mvpMatrix * gl_in[i].gl_Position;
         EmitVertex();
     }
