@@ -36,8 +36,10 @@ GLuint heightMap;
 GLuint texID[5];
 GLuint snowHeightLoc;
 GLuint waterHeightLoc;
+GLuint lgtLoc;
 float currentWaterHeight = 2.0;
 float currentSnowHeight = 6.0;
+float lightX = 0;
 
 //Camera Globals
 float speed = 2.0;
@@ -162,11 +164,17 @@ GLuint loadShader(GLenum shaderType, string filename)
 }
 
 void calculateMatrices(){
+    fprintf(stderr, "Computing Matrices\n");
+    glm::vec4 light = glm::vec4(lightX, 10.0, -50.0, 1.0);
+    fprintf(stderr, "Light Vec X %f, Y %f, Z%f\n", light.x, light.y, light.z);
     glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
     glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
     glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &mvpMatrix[0][0]);
     glUniformMatrix4fv(norMatrixLoc, 1, GL_TRUE, &invMatrix[0][0]);
     glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, &view[0][0]);
+    glm::vec4 lightEye = view * light;
+    fprintf(stderr, "Light Eye X %f, Y %f, Z%f\n", lightEye.x, lightEye.y, lightEye.z);
+    glUniform3fv(lgtLoc, 1, &lightEye[0]);
 }
 
 //Initialise the shader program, create and load buffer data
@@ -209,17 +217,15 @@ void initialise()
 	mvMatrixLoc = glGetUniformLocation(program, "mvMatrix");
 	norMatrixLoc = glGetUniformLocation(program, "norMatrix");
 	heightMap = glGetUniformLocation(program, "heightMap");
-	GLuint lgtLoc = glGetUniformLocation(program, "lightPos");
+	lgtLoc = glGetUniformLocation(program, "lightPos");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
-    glm::vec4 light = glm::vec4(10.0, 10.0, -50.0, 1.0);
 	proj = glm::perspective(30.0f*CDR, 1.25f, 20.0f, 500.0f);  //perspective projection matrix
 	view = glm::lookAt(cameraPos, cameraFront, cameraUp); //view matrix
-	glm::vec4 lightEye = view*light;
 	projView = proj * view;  //Product matrix
 	glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
-	glUniform3fv(lgtLoc, 1, &lightEye[0]);
+
 // Setup texture samplers
     GLuint grassLoc = glGetUniformLocation(program, "grassSampler");
     glUniform1i(grassLoc, 2);
@@ -391,6 +397,12 @@ void onSpecialKey(int key, int x, int y){
             break;
         case GLUT_KEY_RIGHT:
             rotateCamera(1);
+            break;
+        case GLUT_KEY_PAGE_UP:
+            lightX++;
+            break;
+        case GLUT_KEY_PAGE_DOWN:
+            lightX--;
             break;
         default:
             break;
