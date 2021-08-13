@@ -22,9 +22,9 @@ vec4 calculateNormal(){
     return vec4(normalize(cross(vector1, vector2)), 0);
 }
 
-void lightingCalculations(){
+void lightingCalculations(vec4 position){
     vec4 normal = calculateNormal();
-    vec4 posnEye = mvMatrix * gl_in[0].gl_Position;
+    vec4 posnEye = mvMatrix * position;
     normalEye = norMatrix * normal;
     lgtVec = normalize(lightPos - posnEye);
     vec4 viewVec = normalize(vec4(-posnEye.xyz, 0));
@@ -38,7 +38,7 @@ void main(){
 
     for(int i = 0; i < gl_in.length(); i++)
     {
-        lightingCalculations();
+        lightingCalculations(gl_in[i].gl_Position);
         TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
         TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
         height = gl_in[i].gl_Position.y;
