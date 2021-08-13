@@ -16,13 +16,14 @@ void main()
 {
     if (height >= snowHeight){
         gl_FragColor = texture(snowSampler, TexCoord);
-//        gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
     } else if (height < snowHeight && height > 0.1 + waterHeight){
-        gl_FragColor = texture(grassSampler, TexCoord);
-//        gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+        if (height >= snowHeight - 1.0){
+            gl_FragColor = mix(gl_FragColor = texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height);
+        } else {
+            gl_FragColor = texture(grassSampler, TexCoord);
+        }
     }else{
         gl_FragColor = texture(waterSampler, TexCoord);
-//        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
 
 }
