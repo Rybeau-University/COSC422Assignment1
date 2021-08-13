@@ -12,18 +12,20 @@ uniform mat4 mvpMatrix;
 in vec2 TexCoord;
 in float height;
 
+out vec4 outputColor;
+
 void main()
 {
     if (height >= snowHeight){
-        gl_FragColor = texture(snowSampler, TexCoord);
+        outputColor = texture(snowSampler, TexCoord);
     } else if (height < snowHeight && height > 0.1 + waterHeight){
         if (height >= snowHeight - 1.0){
-            gl_FragColor = mix(gl_FragColor = texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height);
+            outputColor = mix(texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height);
         } else {
-            gl_FragColor = texture(grassSampler, TexCoord);
+            outputColor = texture(grassSampler, TexCoord);
         }
     }else{
-        gl_FragColor = texture(waterSampler, TexCoord);
+        outputColor = texture(waterSampler, TexCoord);
     }
 
 }
