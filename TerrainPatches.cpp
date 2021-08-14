@@ -31,6 +31,7 @@ glm::mat4 proj, view;   //Projection and view matrices
 GLuint eyePosLoc;
 GLuint mvMatrixLoc, norMatrixLoc;
 bool wireframe = false;
+
 //Texture Globals
 GLuint heightMap;
 GLuint texID[5];
@@ -43,6 +44,10 @@ float currentSnowHeight = 6.0;
 //Fog
 GLuint fogLoc;
 bool enableFog = false;
+
+//Tessellation
+GLuint tessellationModeLoc;
+bool highTessellation= true;
 
 //Camera Globals
 float speed = 2.0;
@@ -220,6 +225,7 @@ void initialise()
 	heightMap = glGetUniformLocation(program, "heightMap");
 	lgtLoc = glGetUniformLocation(program, "lightPos");
 	fogLoc = glGetUniformLocation(program, "fogEnabled");
+	tessellationModeLoc = glGetUniformLocation(program, "highTessellation");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
@@ -270,6 +276,7 @@ void initialise()
 void display()
 {
     calculateMatrices();
+    glUniform1i(tessellationModeLoc, highTessellation);
     glUniform1i(fogLoc, enableFog);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vaoID);
@@ -337,6 +344,9 @@ void onKeyPress(unsigned char key, int x, int y){
             break;
         case 'f':
             enableFog = !enableFog;
+            break;
+        case 't':
+            highTessellation = ! highTessellation;
             break;
         default:
             break;
