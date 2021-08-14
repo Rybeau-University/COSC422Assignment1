@@ -19,7 +19,7 @@ out vec4 outputColor;
 
 vec4 calculateOutputColor(vec4 material, bool specularEnabled){
     vec4 white = vec4(1.0);
-    vec4 grey = vec4(0.25);
+    vec4 grey = vec4(0.2);
 
     vec4 color;
 

@@ -165,7 +165,7 @@ GLuint loadShader(GLenum shaderType, string filename)
 
 void calculateMatrices(){
     fprintf(stderr, "Computing Matrices\n");
-    glm::vec4 light = glm::vec4(lightX, 10.0, -50.0, 1.0);
+    glm::vec4 light = glm::vec4(lightX, 10.0, -20.0, 1.0);
     fprintf(stderr, "Light Vec X %f, Y %f, Z%f\n", light.x, light.y, light.z);
     glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
     glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
