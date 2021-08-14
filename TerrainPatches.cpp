@@ -1,16 +1,12 @@
-//  ========================================================================
-//  COSC363: Computer Graphics (2021);  University of Canterbury.
-//
-//  FILE NAME: TerrainPatches.cpp
-//  See Lab-11.pdf for details.
-//
-//	The program generates and loads the mesh data for a terrain floor (100 verts, 81 elems).
-//  Requires files  TerrainPatches.vert, TerrainPatches.frag
-//                  TerrainPatches.cont.glsl, TerrainPatches.eval.glsl
-//  ========================================================================
+/*
+ * COSC442 Assignment 1
+ * Terrain Modelling
+ * Author: Ryan Beaumont
+ * Adapted from the terrain modelling programming exercise.
+ *
+ * */
 #define  GLM_FORCE_RADIANS
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -29,7 +25,8 @@ GLushort elems[81*4];       //Element array for 81 quad patches
 glm::mat4 projView;
 glm::mat4 proj, view;   //Projection and view matrices
 GLuint eyePosLoc;
-GLuint mvMatrixLoc, norMatrixLoc;
+GLuint mvMatrixLoc, norMatrixLoc; //Model-view and normal transformation matrix
+
 bool wireframe = false;
 
 //Texture Globals
@@ -90,6 +87,9 @@ void generateData()
 	}
 }
 
+/*
+ * Loads the MtRupehu.tga and MtCook.tga height maps.
+ * */
 void loadHeightMaps(){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texID[0]);
@@ -107,6 +107,9 @@ void loadHeightMaps(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
+/*
+ * Loads the textures used in the height based texturing of the height map.
+ * */
 void loadTextures(){
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texID[2]);
@@ -132,13 +135,12 @@ void loadTextures(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
-//Loads TGA files
+//Loads all TGA files
 void loadTGAs()
 {
     glGenTextures(5, texID);
     loadHeightMaps();
     loadTextures();
-
 }
 
 
@@ -171,8 +173,11 @@ GLuint loadShader(GLenum shaderType, string filename)
 	return shader;
 }
 
+/*
+ * Calculates all the transformation matrices used throughout the shader stages.
+ * Also calculates the light position in eye space.
+ * */
 void calculateMatrices(){
-    fprintf(stderr, "Computing Matrices\n");
     glm::vec4 light = glm::vec4(-50.0, 10.0, 60.0, 1.0);
     glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
     glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
@@ -218,6 +223,8 @@ void initialise()
 		delete[] strInfoLog;
 	}
 	glUseProgram(program);
+
+	// Sets uniform variable locations.
 	eyePosLoc = glGetUniformLocation(program, "eyePos");
 	mvpMatrixLoc = glGetUniformLocation(program, "mvpMatrix");
 	mvMatrixLoc = glGetUniformLocation(program, "mvMatrix");
@@ -234,7 +241,7 @@ void initialise()
 	projView = proj * view;  //Product matrix
 	glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
 
-// Setup texture samplers
+// Setup texture samplers and water and snow height
     GLuint grassLoc = glGetUniformLocation(program, "grassSampler");
     glUniform1i(grassLoc, 2);
     GLuint waterLoc = glGetUniformLocation(program, "waterSampler");
@@ -284,10 +291,16 @@ void display()
 	glFlush();
 }
 
+/*
+ * Changes the currently used height map.
+ * */
 void changeHeightMap(int texture){
     glUniform1i(heightMap, texture);
 }
 
+/*
+ * Toggles between solid and wireframe modes.
+ * */
 void toggleWireframe(){
     if(wireframe){
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -295,9 +308,12 @@ void toggleWireframe(){
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
     wireframe = !wireframe;
-
 }
 
+/*
+ * Adjusts the snow height within the bounds of the maximum height and
+ *  the current water level.
+ * */
 void changeSnowHeight(int direction){
     if(currentSnowHeight > 0.5 + currentWaterHeight && direction == -1){
         currentSnowHeight += 0.1 * direction;
@@ -308,6 +324,10 @@ void changeSnowHeight(int direction){
     }
 }
 
+/*
+ * Adjusts the water height within the bounds of the minimum height and
+ *  the current snow level.
+ * */
 void changeWaterHeight(int direction){
     if(currentSnowHeight - 0.5 > currentWaterHeight && direction == 1){
         currentWaterHeight += 0.1 * direction;
@@ -318,6 +338,9 @@ void changeWaterHeight(int direction){
     }
 }
 
+/*
+ * Key press function for standard keys
+ * */
 void onKeyPress(unsigned char key, int x, int y){
     switch (key) {
         case '1':
@@ -354,6 +377,9 @@ void onKeyPress(unsigned char key, int x, int y){
     glutPostRedisplay();
 }
 
+/*
+ * Calculates the new position of the camera when moved with the up and down arrow keys.
+ * */
 void calculateMove(float direction) {
     float lookX = cameraFront[0];
     float lookZ = cameraFront[2];
@@ -390,16 +416,21 @@ void calculateMove(float direction) {
     cameraPos = glm::vec3 (camX,camY,camZ);
     cameraFront += glm::vec3 (moveX * direction * speed,0.0,moveZ * direction * speed);
     view = glm::lookAt(cameraPos, cameraFront, cameraUp);
-    fprintf(stderr, "X %f, Y%f, Z%f\n", cameraPos[0], cameraPos[1], cameraPos[2]);
     glUniform3fv(eyePosLoc, 1, glm::value_ptr(cameraPos));
 }
 
+/*
+ * Rotates the camera when the left and right arrow keys are pressed.
+ * */
 void rotateCamera(float direction){
     angle += direction * 5 * CDR;
     cameraFront = glm::vec3(camX+cos(angle), camY, camZ+sin(angle));
     view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 }
 
+/*
+ * Key press function for the special keys.
+ * */
 void onSpecialKey(int key, int x, int y){
     switch(key){
         case GLUT_KEY_UP:
