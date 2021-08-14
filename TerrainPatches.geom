@@ -9,6 +9,7 @@ uniform vec3 cameraPos;
 uniform vec4 lightPos;
 
 out float height;
+out float zPosition;
 out vec4 oColor;
 out vec2 TexCoord;
 out vec4 lgtVec;
@@ -42,6 +43,7 @@ void main(){
         TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
         TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
         height = gl_in[i].gl_Position.y;
+        zPosition = gl_in[i].gl_Position.z;
         gl_Position = mvpMatrix * gl_in[i].gl_Position;
         EmitVertex();
     }

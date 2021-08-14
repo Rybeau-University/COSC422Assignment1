@@ -6,11 +6,12 @@ uniform sampler2D snowSampler;
 uniform sampler2D heightMap;
 uniform float snowHeight;
 uniform float waterHeight;
-
+uniform bool fogEnabled;
 uniform mat4 mvpMatrix;
 
 in vec2 TexCoord;
 in float height;
+in float zPosition;
 in vec4 lgtVec;
 in vec4 normalEye;
 in vec4 halfVec;
@@ -20,7 +21,7 @@ out vec4 outputColor;
 vec4 calculateOutputColor(vec4 material, bool water){
     vec4 white = vec4(1.0);
     vec4 grey = vec4(0.2);
-
+    float fogMin = 0.0, fogMax = -130;
     vec4 color;
     vec4 ambOut;
     if (water){
@@ -38,6 +39,14 @@ vec4 calculateOutputColor(vec4 material, bool water){
     if (water){
         color += specOut;
     }
+
+    if (fogEnabled){
+        if(zPosition <= fogMin){
+            float t = (zPosition - fogMin) / (fogMax - fogMin);
+            color = (1 - t) * color + t * white;
+        }
+    }
+
     return color;
 }
 

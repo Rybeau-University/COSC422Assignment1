@@ -40,6 +40,10 @@ GLuint lgtLoc;
 float currentWaterHeight = 2.0;
 float currentSnowHeight = 6.0;
 
+//Fog
+GLuint fogLoc;
+bool enableFog = false;
+
 //Camera Globals
 float speed = 2.0;
 float camX = 0.0;
@@ -165,14 +169,12 @@ GLuint loadShader(GLenum shaderType, string filename)
 void calculateMatrices(){
     fprintf(stderr, "Computing Matrices\n");
     glm::vec4 light = glm::vec4(0.0, 10.0, -20.0, 1.0);
-    fprintf(stderr, "Light Vec X %f, Y %f, Z%f\n", light.x, light.y, light.z);
     glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
     glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
     glUniformMatrix4fv(mvpMatrixLoc, 1, GL_FALSE, &mvpMatrix[0][0]);
     glUniformMatrix4fv(norMatrixLoc, 1, GL_TRUE, &invMatrix[0][0]);
     glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, &view[0][0]);
     glm::vec4 lightEye = view * light;
-    fprintf(stderr, "Light Eye X %f, Y %f, Z%f\n", lightEye.x, lightEye.y, lightEye.z);
     glUniform3fv(lgtLoc, 1, &lightEye[0]);
 }
 
@@ -217,6 +219,7 @@ void initialise()
 	norMatrixLoc = glGetUniformLocation(program, "norMatrix");
 	heightMap = glGetUniformLocation(program, "heightMap");
 	lgtLoc = glGetUniformLocation(program, "lightPos");
+	fogLoc = glGetUniformLocation(program, "fogEnabled");
 	glUniform1i(heightMap, 0);
 
 //--------Compute matrices----------------------
@@ -267,6 +270,7 @@ void initialise()
 void display()
 {
     calculateMatrices();
+    glUniform1i(fogLoc, enableFog);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_PATCHES, 81*4, GL_UNSIGNED_SHORT, NULL);
@@ -330,6 +334,9 @@ void onKeyPress(unsigned char key, int x, int y){
             break;
         case 'a':
             changeWaterHeight(-1);
+            break;
+        case 'f':
+            enableFog = !enableFog;
             break;
         default:
             break;
