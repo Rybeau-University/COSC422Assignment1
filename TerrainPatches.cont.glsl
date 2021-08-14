@@ -4,6 +4,11 @@ layout(vertices = 4) out;
 uniform vec3 eyePos;
 uniform bool highTessellation;
 
+/**
+    Calculates the dynamic level of detail tessellation level. The range between the low and high tessellation
+    level can be toggled using 't'. The maximum distance is set as the furthest point the camera is allowed to travel
+    from the terrain map in the camera bounds I have set.
+*/
 void main()
 {
     float highLevel, lowLevel;
