@@ -27,16 +27,10 @@ vec4 calculateOutputColor(vec4 material, bool water){
     } else {
         ambOut = grey * material;
     }
-    float shininess = 100.0;
     float diffTerm = max(dot(lgtVec, normalEye), 0.1);
     vec4 diffOut = material * diffTerm;
-    float specTerm = max(dot(halfVec, normalEye), 0.0);
-    vec4 specOut = white *  pow(specTerm, shininess);
 
     color = ambOut + diffOut;
-    if (water){
-        color += specOut;
-    }
 
     if (fogEnabled){
         if(oPosition.z <= fogMin){
