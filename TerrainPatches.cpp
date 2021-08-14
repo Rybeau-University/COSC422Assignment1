@@ -39,7 +39,6 @@ GLuint waterHeightLoc;
 GLuint lgtLoc;
 float currentWaterHeight = 2.0;
 float currentSnowHeight = 6.0;
-float lightX = 0;
 
 //Camera Globals
 float speed = 2.0;
@@ -165,7 +164,7 @@ GLuint loadShader(GLenum shaderType, string filename)
 
 void calculateMatrices(){
     fprintf(stderr, "Computing Matrices\n");
-    glm::vec4 light = glm::vec4(lightX, 10.0, -20.0, 1.0);
+    glm::vec4 light = glm::vec4(0.0, 10.0, -20.0, 1.0);
     fprintf(stderr, "Light Vec X %f, Y %f, Z%f\n", light.x, light.y, light.z);
     glm::mat4 mvpMatrix = proj * view;   //The model-view-projection transformation
     glm::mat4 invMatrix = glm::inverse(view);  //Inverse of model-view matrix for normal transformation
@@ -397,12 +396,6 @@ void onSpecialKey(int key, int x, int y){
             break;
         case GLUT_KEY_RIGHT:
             rotateCamera(1);
-            break;
-        case GLUT_KEY_PAGE_UP:
-            lightX++;
-            break;
-        case GLUT_KEY_PAGE_DOWN:
-            lightX--;
             break;
         default:
             break;
