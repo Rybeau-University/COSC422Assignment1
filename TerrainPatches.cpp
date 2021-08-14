@@ -1,7 +1,7 @@
 /*
  * COSC442 Assignment 1
  * Terrain Modelling
- * Author: Ryan Beaumont
+ * Ryan Beaumont 31591316
  * Adapted from the terrain modelling programming exercise.
  *
  * */
@@ -27,6 +27,7 @@ glm::mat4 proj, view;   //Projection and view matrices
 GLuint eyePosLoc;
 GLuint mvMatrixLoc, norMatrixLoc; //Model-view and normal transformation matrix
 
+//Wireframe Toggle
 bool wireframe = false;
 
 //Texture Globals
