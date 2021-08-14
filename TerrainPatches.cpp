@@ -48,7 +48,7 @@ float camZ = 30.0;
 float camY = 20.0;
 float angle = -90.0 * CDR;
 glm::vec3 cameraPos   = glm::vec3(camX, camY, camZ);
-glm::vec3 cameraFront = glm::vec3(camX+cos(angle), 20.0, camZ+sin(angle));
+glm::vec3 cameraFront = glm::vec3(camX+cos(angle), camY, camZ+sin(angle));
 glm::vec3 cameraUp = glm::vec3(0.0, 1.0, 0.0);
 
 //Generate vertex and element data for the terrain floor
@@ -380,7 +380,7 @@ void calculateMove(float direction) {
 
 void rotateCamera(float direction){
     angle += direction * 5 * CDR;
-    cameraFront = glm::vec3(camX+cos(angle), 20.0, camZ+sin(angle));
+    cameraFront = glm::vec3(camX+cos(angle), camY, camZ+sin(angle));
     view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 }
 
