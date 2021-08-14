@@ -17,13 +17,17 @@ in vec4 halfVec;
 
 out vec4 outputColor;
 
-vec4 calculateOutputColor(vec4 material, bool specularEnabled){
+vec4 calculateOutputColor(vec4 material, bool water){
     vec4 white = vec4(1.0);
     vec4 grey = vec4(0.2);
 
     vec4 color;
-
-    vec4 ambOut = grey * material;
+    vec4 ambOut;
+    if (water){
+        ambOut = (1 - min(waterHeight - texture(heightMap, TexCoord).r * 10, 0.7)) * material;
+    } else {
+        ambOut = grey * material;
+    }
     float shininess = 100.0;
     float diffTerm = max(dot(lgtVec, normalEye), 0.1);
     vec4 diffOut = material * diffTerm;
@@ -31,7 +35,7 @@ vec4 calculateOutputColor(vec4 material, bool specularEnabled){
     vec4 specOut = white *  pow(specTerm, shininess);
 
     color = ambOut + diffOut;
-    if (specularEnabled){
+    if (water){
         color += specOut;
     }
     return color;
