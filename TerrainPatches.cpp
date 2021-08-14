@@ -180,7 +180,7 @@ void calculateMatrices(){
     glUniformMatrix4fv(norMatrixLoc, 1, GL_TRUE, &invMatrix[0][0]);
     glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, &view[0][0]);
     glm::vec4 lightEye = view * light;
-    glUniform3fv(lgtLoc, 1, &lightEye[0]);
+    glUniform4fv(lgtLoc, 1, &lightEye[0]);
 }
 
 //Initialise the shader program, create and load buffer data
