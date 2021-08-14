@@ -5,11 +5,9 @@ layout (triangle_strip, max_vertices = 4) out;
 uniform mat4 mvMatrix;
 uniform mat4 norMatrix;
 uniform mat4 mvpMatrix;
-uniform vec3 cameraPos;
 uniform vec4 lightPos;
 
-out float height;
-out float zPosition;
+out vec3 oPosition;
 out vec4 oColor;
 out vec2 TexCoord;
 out vec4 lgtVec;
@@ -42,8 +40,7 @@ void main(){
         lightingCalculations(gl_in[i].gl_Position);
         TexCoord.s = (gl_in[i].gl_Position.x -  xmin)/(xmax - xmin);
         TexCoord.t = (gl_in[i].gl_Position.z - zmin)/ (zmax - zmin);
-        height = gl_in[i].gl_Position.y;
-        zPosition = gl_in[i].gl_Position.z;
+        oPosition = gl_in[i].gl_Position.xyz;
         gl_Position = mvpMatrix * gl_in[i].gl_Position;
         EmitVertex();
     }

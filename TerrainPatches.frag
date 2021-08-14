@@ -7,11 +7,9 @@ uniform sampler2D heightMap;
 uniform float snowHeight;
 uniform float waterHeight;
 uniform bool fogEnabled;
-uniform mat4 mvpMatrix;
 
 in vec2 TexCoord;
-in float height;
-in float zPosition;
+in vec3 oPosition;
 in vec4 lgtVec;
 in vec4 normalEye;
 in vec4 halfVec;
@@ -41,8 +39,8 @@ vec4 calculateOutputColor(vec4 material, bool water){
     }
 
     if (fogEnabled){
-        if(zPosition <= fogMin){
-            float t = (zPosition - fogMin) / (fogMax - fogMin);
+        if(oPosition.z <= fogMin){
+            float t = (oPosition.z - fogMin) / (fogMax - fogMin);
             color = (1 - t) * color + t * white;
         }
     }
@@ -54,11 +52,11 @@ vec4 calculateOutputColor(vec4 material, bool water){
 void main()
 {
 
-    if (height >= snowHeight){
+    if (oPosition.y >= snowHeight){
         outputColor = calculateOutputColor(texture(snowSampler, TexCoord), false);
-    } else if (height < snowHeight && height > 0.01 + waterHeight){
-        if (height >= snowHeight - 1.0){
-            outputColor = calculateOutputColor(mix(texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - height), false);
+    } else if (oPosition.y < snowHeight && oPosition.y > 0.01 + waterHeight){
+        if (oPosition.y >= snowHeight - 1.0){
+            outputColor = calculateOutputColor(mix(texture(snowSampler, TexCoord), texture(grassSampler, TexCoord), snowHeight - oPosition.y), false);
         } else {
             outputColor = calculateOutputColor(texture(grassSampler, TexCoord), false);
         }
