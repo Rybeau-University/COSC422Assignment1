@@ -11,8 +11,8 @@ void main()
         highLevel = 100.0;
         lowLevel = 30.0;
     } else {
-        highLevel = 30.0;
-        lowLevel = 10.0;
+        highLevel = 20.0;
+        lowLevel = 5.0;
     }
     float distanceMin = 20.0, distanceMax = distance(vec3(150.0, 20.0, 120.0), vec3(-50, 0.0, -100.0));
     vec3 avg_position = vec3((gl_in[0].gl_Position +
