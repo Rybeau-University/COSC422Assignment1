@@ -14,7 +14,7 @@ This repository contains my submission for the COSC422 Terrain Rendering Assignm
 ### Mt Cook Model
 ![Mt Cook Model](https://i.imgur.com/gVqFXc8.png "Mt Cook Model")
 ### Fog Render
-![Fog](https://i.imgur.com/YJoHsSk.png "Fog")
+![Fog](https://i.imgur.com/H88BsFz.png "Fog")
 
 ## Controls
 -	‘1’ and ‘2’ switch between the two terrain maps.
