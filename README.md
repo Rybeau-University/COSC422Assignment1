@@ -9,8 +9,8 @@ This repository contains my submission for the COSC422 Terrain Rendering Assignm
 - Water Specular Reflections
 
 ## Final Output
-![Terrain Model 1](https://imgur.com/6162e926-b1f6-41be-a423-0a7d58ce5a94 "Terrain Model 1")
-![Terrain Model 2](https://imgur.com/6162e926-b1f6-41be-a423-0a7d58ce5a94 "Terrain Model 2")
+![Terrain Model 1](https://i.imgur.com/gVqFXc8.png "Terrain Model 1")
+![Terrain Model 2](https://i.imgur.com/YJoHsSk.png "Terrain Model 2")
 
 ## Controls
 -	‘1’ and ‘2’ switch between the two terrain maps.
